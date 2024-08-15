@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <meta http-equiv="CONTENT-TYPE" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="styles/style.css"/>
+  <title>CollideTest</title>
+  <style>
+  body{
+  background-color: green;
+  overflow:hidden;
+  margin:0px;
+}
+  </style>
+</head>
+<body>
+  <canvas id="canvas"></canvas>
+  
+<script>
+let canvas = document.getElementById("canvas")
+let ctx = canvas.getContext("2d")
+canvas.width = window.innerWidth
+canvas.height = window.innerHeight
+
+class Particle{
+  constructor(game){
+    this.game = game
+    this.x = Math.floor(Math.random() * 300) + 50
+    this.y = Math.floor(Math.random() * 300) + 50
+    this.r = 20
+    this.velocity = {
+      x: Math.floor(Math.random() * 10) + 2,
+      y: Math.floor(Math.random() * 10) + 2
+    }
+    let r = Math.floor(Math.random() * 256)
+    let g = Math.floor(Math.random() * 256)
+    let b = Math.floor(Math.random() * 256)
+    this.color ="rgb(" + r + "," + g + "," + b + ")"
+  }
+  draw(ctx){
+    ctx.beginPath()
+    ctx.arc(this.x,this.y,this.r,0,6.29)
+    ctx.fillStyle = this.color
+    ctx.fill()
+  }
+  update(){
+    this.x += this.velocity.x
+    this.y += this.velocity.y
+  }
+  edge(){
+    if(this.x - this.r < 0 || this.x + this.r > this.game.width){
+      this.velocity.x *= -1
+    }
+    if(this.y - this.r < 0 || this.y + this.r > this.game.height){
+      this.velocity.y *= -1
+    }
+  }
+}
+class Game{
+  constructor(canvas){
+    this.width = canvas.width
+    this.height = canvas.height
+    this.bg = {
+      width: this.width,
+      height: this.height,
+      x: 0,
+      y:0,
+      color: "white"
+    }
+    this.particles = []
+    this.particles.push(new Particle(this))
+  }
+  drawBackground(ctx){
+    ctx.fillStyle = this.bg.color
+    ctx.fillRect(this.bg.x,this.bg.y,this.bg.width,this.bg.height)
+  }
+  render(ctx){
+    this.drawBackground(ctx)
+    this.particles.forEach(particle =>{
+      particle.draw(ctx)
+      particle.update()
+      particle.edge()
+    })
+  }
+}
+let game = new Game(canvas)
+let loop = 1
+function animate(){
+  ctx.clearRect(0,0,game.width, game.height)
+  game.render(ctx)
+  
+  
+    loop++
+    if(loop == 12){
+      loop = 1
+      game.particles.push(new Particle(game))
+    }
+  requestAnimationFrame(animate)
+}
+  animate()
+canvas.addEventListener("touchstart", e => {
+  alert(game.particles.length)
+})
+</script>
+</body>
+</html>
